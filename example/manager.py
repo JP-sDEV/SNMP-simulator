@@ -12,7 +12,8 @@ snmpEngine = engine.SnmpEngine()
 config.add_transport(
     snmpEngine,
     udp.DOMAIN_NAME + (1,),
-    udp.UdpTransport().open_server_mode(("127.0.0.1", 162)),
+    # must use sudo for port 162
+    udp.UdpTransport().open_server_mode(("127.0.0.1", 162))
 )
 
 # UDP over IPv4, second listening interface/port
