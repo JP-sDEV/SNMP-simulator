@@ -60,15 +60,24 @@ class SNMPManager:
                     print(f"{oid.prettyPrint()} = {val.prettyPrint()}")
         return wholeMsg
 
-    def run(self):
+    async def run(self):
         try:
-            asyncio.run(self.run_async())
+            await self.run_async()
         except KeyboardInterrupt:
             print("Shutting down...")
         finally:
             self.transportDispatcher.close_dispatcher()
 
 
-if __name__ == '__main__':
+async def start_manager():
     manager = SNMPManager()
-    manager.run()
+    await manager.run()
+
+if __name__ == '__main__':
+    try:
+        asyncio.run(start_manager())
+    except RuntimeError as e:
+        if "while another loop is running" in str(e):
+            # Fallback if already in an environment with a running event loop
+            print("An event loop is already running; switching to await.")
+            asyncio.get_event_loop().run_until_complete(start_manager())
