@@ -180,6 +180,12 @@ class SNMPAgent:
         else:
             self.varbinds[OID] = value
 
+    def get_varbinds(self):
+        """
+        Returns the agent's varbinds dictionary
+        """
+        return self.varbinds
+
     async def send_trap(self):
         """
         Constructs and sends an SNMP trap (notification) using the specified
