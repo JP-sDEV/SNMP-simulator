@@ -8,26 +8,59 @@ import random
 import datetime
 from dotenv import load_dotenv
 
-load_dotenv()
+# Determine which .env file to load
+env_file = '.env.test' if os.getenv('PYTEST_CURRENT_TEST') else '.env'
+load_dotenv(env_file)  # Load the appropriate environment file
 
 
 class SNMPAgent:
-    def __init__(self):
+    def __init__(self, amount=1000.00, ipv4_host=os.getenv('IPv4_HOST_IP'),
+                 port=os.getenv('PORT')):
         self.snmp_engine = SnmpEngine()
         self.community = CommunityData('public', mpModel=1)  # SNMPv2c
         self.context = ContextData()
-        self.target_ip = os.getenv('IPv4_HOST_IP')
-        self.target_port = int(os.getenv('PORT'))
+        # TRAP details
+        self.target = {
+            'ip': str(ipv4_host),
+            'port': int(port)
+        }
+        self.varbinds = {}
+        self.amount = amount
 
     @staticmethod
     def generate_random_mid(length=8):
         return ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
                                       k=length))
 
-    async def send_trap(self, amount="$1000.00"):
+    def get_amount(self):
+        return self.amount
+
+    # varbinds
+    def add_varbind(self, OID, value):
+        if OID not in self.varbinds:
+            # raise error
+            pass
+        else:
+            self.varbinds[OID] = value
+
+    def remove_varbind(self, OID):
+        if OID not in self.varbinds:
+            # raise error
+            pass
+        else:
+            del self.varbinds[OID]
+
+    def edit_varbind(self, OID, value):
+        if OID not in self.varbinds:
+            # raise error
+            pass
+        else:
+            self.varbinds[OID] = value
+
+    async def send_trap(self):
         # Set up SNMP target
-        target = await UdpTransportTarget.create((self.target_ip,
-                                                  self.target_port))
+        target = await UdpTransportTarget.create((self.target['ip'],
+                                                  int(self.target['port'])))
 
         # Generate MID and timestamps
         mid = self.generate_random_mid()
@@ -46,7 +79,7 @@ class SNMPAgent:
             ObjectType(ObjectIdentity(os.getenv('OID_SETTLEMENT_STATUS')),
                        univ.OctetString('submitted')),
             ObjectType(ObjectIdentity(os.getenv('OID_SETTLEMENT_AMOUNT')),
-                       univ.OctetString(amount)),
+                       univ.OctetString("$" + str(self.amount))),
             ObjectType(ObjectIdentity(os.getenv('OID_SETTLEMENT_ENTITY')),
                        univ.OctetString('merchant')),
             ObjectType(ObjectIdentity(os.getenv('OID_SETTLEMENT_MID')),
