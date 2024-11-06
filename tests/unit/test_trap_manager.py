@@ -5,6 +5,19 @@ from src.commands.trap.manager import SNMPManager
 from src.agents.transaction import TransactionSNMPAgent
 
 
+sample_varbinds = {
+            os.getenv('OID_SETTLEMENT_TYPE'): 'settlement',
+            os.getenv('OID_SETTLEMENT_STATUS'): 'submitted',
+            os.getenv('OID_SETTLEMENT_AMOUNT'): '1000',
+            os.getenv('OID_SETTLEMENT_ENTITY'): 'merchant',
+            os.getenv('OID_SETTLEMENT_MID'): 'abc123',
+            os.getenv('OID_SETTLEMENT_DEPOSIT_DATE'): '123',
+            os.getenv('OID_SETTLEMENT_OPEN_DATE'): '321',
+            os.getenv('OID_SETTLEMENT_CLOSE_DATE'): '111',
+            os.getenv('OID_SETTLEMENT_SUBMISSION_DATE'): '222',
+            }
+
+
 @pytest.mark.asyncio
 async def test_snmp_manager():
     manager = SNMPManager()
@@ -23,24 +36,13 @@ async def test_snmp_manager():
 async def test_trap_capture(capfd):
     # Initialize and start the SNMP manager
     notification_OID = os.getenv('OID_SETTLEMENT_STATUS')
-    varbinds = {
-            os.getenv('OID_SETTLEMENT_TYPE'): 'settlement',
-            os.getenv('OID_SETTLEMENT_STATUS'): 'submitted',
-            os.getenv('OID_SETTLEMENT_AMOUNT'): '1000',
-            os.getenv('OID_SETTLEMENT_ENTITY'): 'merchant',
-            os.getenv('OID_SETTLEMENT_MID'): 'abc123',
-            os.getenv('OID_SETTLEMENT_DEPOSIT_DATE'): '123',
-            os.getenv('OID_SETTLEMENT_OPEN_DATE'): '321',
-            os.getenv('OID_SETTLEMENT_CLOSE_DATE'): '111',
-            os.getenv('OID_SETTLEMENT_SUBMISSION_DATE'): '222',
-            }
 
     manager = SNMPManager()
     manager_task = asyncio.create_task(manager.run_async())
 
     # Initialize the SNMP agent
     agent = TransactionSNMPAgent(notification_OID=notification_OID,
-                                 varbinds=varbinds)
+                                 varbinds=sample_varbinds)
 
     try:
         # Allow some time for the manager to start
@@ -69,3 +71,17 @@ async def test_trap_capture(capfd):
         manager.stop()
         await manager_task
         assert manager._running is False
+
+
+@pytest.mark.asyncio
+async def test_set_notification_type():
+    # Initialize and start the SNMP manager
+    notification_OID = os.getenv('OID_SETTLEMENT_STATUS')
+
+    # Initialize the SNMP agent
+    agent = TransactionSNMPAgent(notification_OID=notification_OID,
+                                 varbinds=sample_varbinds)
+    agent.set_mid(os.getenv('OID_SETTLEMENT_MID'), 'changed')
+    agent_varbinds = agent.get_varbinds()
+
+    assert agent_varbinds[os.getenv('OID_SETTLEMENT_MID')] == 'changed'
