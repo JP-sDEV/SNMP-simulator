@@ -25,7 +25,7 @@ class SNMPNotification:
         varbinds (dict [str:str]): Key-value pairs where each OID (str) is
             associated with a value (str) to be sent in the notification
     """
-    def __init__(self, notification_type_OID, varbinds):
+    def __init__(self, notification_type_OID: str, varbinds: dict):
         """
         Initializes a SNMPNotification instance with the provided notification
         type OID and a dictionary of varbinds.
@@ -61,19 +61,37 @@ class SNMPNotification:
             NotificationType: A configured SNMP notification with all varbinds
             added.
         """
+        if (self.notification_type_OID is None or
+                self.notification_type_OID == ''):
+            raise AttributeError('notification_type_OID is not specficied')
+
+        if (not isinstance(self.varbinds, dict)):
+            raise AttributeError('varbinds is not type dict')
+
+        if (not isinstance(self.notification_type_OID, str)):
+            raise AttributeError('notification_type_OID is not type str')
+
         # Create the NotificationType object
         notification = NotificationType(ObjectIdentity(
             self.notification_type_OID))
 
-        # Add varbinds to the notification from the dictionary
-        for oid, value in self.varbinds.items():
-            notification.add_varbinds(
-                ObjectType(
-                    ObjectIdentity(oid),
-                    univ.OctetString(value)
+        if (self.varbinds):
+            # Add varbinds to the notification from the dictionary
+            for oid, value in self.varbinds.items():
+                notification.add_varbinds(
+                    ObjectType(
+                        ObjectIdentity(oid),
+                        univ.OctetString(value)
+                    )
                 )
-            )
+
         return notification
+
+    def get_varbinds(self):
+        """
+        Returns the agent's varbinds dictionary
+        """
+        return self.varbinds
 
 
 class SNMPAgent:
@@ -94,7 +112,7 @@ class SNMPAgent:
                  ipv4_host=os.getenv('IPv4_HOST_IP'),
                  port=os.getenv('PORT'),
                  notification_OID=None,
-                 varbinds=None):
+                 varbinds=dict()):
         """
         Initializes the SNMPAgent with host details, notification OID, and
         varbinds.
@@ -114,22 +132,32 @@ class SNMPAgent:
         # TRAP details
         self.target = {
             'ip': str(ipv4_host),
+            # Raises 'TypeError' if port is not 'int' type
             'port': int(port)
         }
         self.notification_OID = notification_OID
         self.varbinds = varbinds
 
+        if ipv4_host is None:
+            raise ValueError('Argument "ipv4_host" cannot be empty')
+
     # Varbinds
-    def set_notifcation_type(self, OID):
+    def set_notifcation_type(self, OID: str):
         """
         Sets the OID for the SNMP notification type.
 
         Args:
             OID (str): The Object Identifier (OID) for the notification type.
         """
+        if (OID is None or OID == ''):
+            raise ValueError('Argument "OID" cannot be empty')
+
+        if (not isinstance(OID, str)):
+            raise ValueError('Argument "OID" cannot be non-string')
+
         self.notification_OID = OID
 
-    def add_varbind(self, OID, value):
+    def add_varbind(self, OID: str, value: str):
         """
         Adds a new varbind to the agent's varbind dictionary.
 
@@ -140,13 +168,25 @@ class SNMPAgent:
         Raises:
             KeyError: If the OID already exists in the varbinds dictionary.
         """
-        if OID in self.varbinds:
-            raise KeyError(f"OID '{OID}' already exists in varbinds. Please\
-                           ensure OID is not already in use.")
-        else:
-            self.varbinds[OID] = value
+        if (OID is None or OID == ''):
+            raise ValueError('Argument "OID" cannot be empty')
 
-    def remove_varbind(self, OID):
+        if (not isinstance(OID, str)):
+            raise ValueError('Argument "OID" cannot be non-string')
+
+        if (value is None):
+            raise ValueError('Argument "value" cannot be empty')
+
+        if (not isinstance(value, str)):
+            raise ValueError('Argument "value" cannot be non-string')
+
+        if OID in self.varbinds:
+            raise KeyError("OID already exists in varbinds. Please\
+                           ensure OID is not already in use.")
+
+        self.varbinds[OID] = value
+
+    def remove_varbind(self, OID: str):
         """
         Removes a varbind from the agent's varbind dictionary.
 
@@ -156,13 +196,19 @@ class SNMPAgent:
         Raises:
             KeyError: If the OID is not found in the varbinds dictionary.
         """
+        if (OID is None or OID == ''):
+            raise ValueError('Argument "OID" cannot be empty')
+
+        if (not isinstance(OID, str)):
+            raise ValueError('Argument "OID" cannot be non-string')
+
         if OID not in self.varbinds:
             raise KeyError(f"OID '{OID}' not found in varbinds. Please ensure\
                            it exists before removing.")
         else:
             del self.varbinds[OID]
 
-    def edit_varbind(self, OID, value):
+    def edit_varbind(self, OID: str, value: str):
         """
         Edits the value of an existing varbind in the agent's varbind
         dictionary.
@@ -174,17 +220,35 @@ class SNMPAgent:
         Raises:
             KeyError: If the OID is not found in the varbinds dictionary.
         """
+        if (OID is None or OID == ''):
+            raise ValueError('Argument "OID" cannot be empty')
+
+        if (not isinstance(OID, str)):
+            raise ValueError('Argument "OID" cannot be non-string')
+
+        if (value is None):
+            raise ValueError('Argument "value" cannot be empty')
+
+        if (not isinstance(value, str)):
+            raise ValueError('Argument "value" cannot be non-string')
+
         if OID not in self.varbinds:
-            raise KeyError(f"OID '{OID}' not found in varbinds. Please ensure\
+            raise KeyError("OID not found in varbinds. Please ensure\
                            it exists before editing.")
-        else:
-            self.varbinds[OID] = value
+
+        self.varbinds[OID] = value
 
     def get_varbinds(self):
         """
         Returns the agent's varbinds dictionary
         """
         return self.varbinds
+
+    def get_notification_OID(self):
+        """
+        Returns the agent's notification OID
+        """
+        return self.notification_OID
 
     async def send_trap(self):
         """
@@ -198,6 +262,15 @@ class SNMPAgent:
             Exception: If the trap cannot be sent due to connection issues.
         """
         # Set up SNMP target
+        if (self.target['ip'] is None or self.target['port'] is None):
+            raise ValueError('Attributes in "target" cannot be empty')
+
+        if (self.notification_OID is None):
+            raise ValueError('Attribute "notification_OID" cannot be empty')
+
+        if (self.varbinds is None):
+            raise ValueError('Attribute "varbinds" cannot be empty')
+
         target = await UdpTransportTarget.create((self.target['ip'],
                                                   int(self.target['port'])))
 
@@ -214,10 +287,13 @@ class SNMPAgent:
             'trap',
             notification
         )
-        print("Settlement trap sent successfully.")
+        if os.getenv('PYTEST_CURRENT_TEST'):
+            print("Settlement trap sent successfully.")
 
 
 # Example usage
 if __name__ == "__main__":
-    agent = SNMPAgent()
+    notification_OID = os.getenv('OID_SETTLEMENT_STATUS')
+    agent = SNMPAgent(notification_OID=notification_OID,
+                      varbinds={'1.3.6.1.4.1.9.9.599.1.3.1': 'status_test'})
     asyncio.run(agent.send_trap())

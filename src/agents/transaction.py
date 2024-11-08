@@ -29,12 +29,12 @@ class TransactionSNMPAgent(SNMPAgent):
     """
 
     def __init__(self,
-                 ipv4_host=os.getenv('IPv4_HOST_IP'),
-                 port=os.getenv('PORT'),
-                 notification_OID=None,
-                 varbinds=None):
+                 ipv4_host: str = os.getenv('IPv4_HOST_IP'),
+                 port: str = os.getenv('PORT'),
+                 notification_OID: str = None,
+                 varbinds: dict = None):
         """
-        Initializes the TransactionSNMPAgent with host details and optional 
+        Initializes the TransactionSNMPAgent with host details and optional
         varbinds.
 
         Args:
@@ -50,7 +50,7 @@ class TransactionSNMPAgent(SNMPAgent):
         super().__init__(ipv4_host, port, notification_OID, varbinds)
 
     @staticmethod
-    def generate_random_mid(length=8):
+    def generate_random_mid(length: int = 8):
         """
         Generates a random Merchant ID (MID) for transactions.
 
