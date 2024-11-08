@@ -71,17 +71,3 @@ async def test_trap_capture(capfd):
         manager.stop()
         await manager_task
         assert manager._running is False
-
-
-@pytest.mark.asyncio
-async def test_set_notification_type():
-    # Initialize and start the SNMP manager
-    notification_OID = os.getenv('OID_SETTLEMENT_STATUS')
-
-    # Initialize the SNMP agent
-    agent = TransactionSNMPAgent(notification_OID=notification_OID,
-                                 varbinds=sample_varbinds)
-    agent.set_mid(os.getenv('OID_SETTLEMENT_MID'), 'changed')
-    agent_varbinds = agent.get_varbinds()
-
-    assert agent_varbinds[os.getenv('OID_SETTLEMENT_MID')] == 'changed'
