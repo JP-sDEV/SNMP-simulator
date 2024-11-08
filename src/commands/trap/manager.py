@@ -93,7 +93,7 @@ class SNMPManager:
         Callback function to process received SNMP messages.
 
         Args:
-            transportDispatcher (AsyncioDispatcher): The dispatcher handling 
+            transportDispatcher (AsyncioDispatcher): The dispatcher handling
                 the transport.
             transportDomain (tuple): The transport domain (protocol) used
                 (e.g., UDP).
