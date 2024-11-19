@@ -3,19 +3,20 @@ import pytest
 import asyncio
 from src.commands.trap.manager import SNMPManager
 from src.client.agents.transaction import TransactionSNMPAgent
+from src.client.components.varbinds import Varbind
 
 
-sample_varbinds = {
-            os.getenv('OID_SETTLEMENT_TYPE'): 'settlement',
-            os.getenv('OID_SETTLEMENT_STATUS'): 'submitted',
-            os.getenv('OID_SETTLEMENT_AMOUNT'): '1000',
-            os.getenv('OID_SETTLEMENT_ENTITY'): 'merchant',
-            os.getenv('OID_SETTLEMENT_MID'): 'abc123',
-            os.getenv('OID_SETTLEMENT_DEPOSIT_DATE'): '123',
-            os.getenv('OID_SETTLEMENT_OPEN_DATE'): '321',
-            os.getenv('OID_SETTLEMENT_CLOSE_DATE'): '111',
-            os.getenv('OID_SETTLEMENT_SUBMISSION_DATE'): '222',
-            }
+sample_varbinds = [
+            Varbind(os.getenv('OID_SETTLEMENT_TYPE'), 'settlement'),
+            Varbind(os.getenv('OID_SETTLEMENT_STATUS'), 'submitted'),
+            Varbind(os.getenv('OID_SETTLEMENT_AMOUNT'), '1000'),
+            Varbind(os.getenv('OID_SETTLEMENT_ENTITY'), 'merchant'),
+            Varbind(os.getenv('OID_SETTLEMENT_MID'), 'abc123'),
+            Varbind(os.getenv('OID_SETTLEMENT_DEPOSIT_DATE'), '123'),
+            Varbind(os.getenv('OID_SETTLEMENT_OPEN_DATE'), '321'),
+            Varbind(os.getenv('OID_SETTLEMENT_CLOSE_DATE'), '111'),
+            Varbind(os.getenv('OID_SETTLEMENT_SUBMISSION_DATE'), '222')
+]
 
 
 @pytest.mark.asyncio
