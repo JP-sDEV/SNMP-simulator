@@ -2,7 +2,7 @@ import os
 import pytest
 import asyncio
 from src.commands.trap.manager import SNMPManager
-from src.agents.transaction import TransactionSNMPAgent
+from src.client.agents.transaction import TransactionSNMPAgent
 
 
 sample_varbinds = {

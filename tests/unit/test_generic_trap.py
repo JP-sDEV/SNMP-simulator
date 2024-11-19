@@ -1,6 +1,6 @@
 import os
 import pytest
-from src.agents.generic import SNMPAgent
+from src.client.agents.generic import SNMPAgent
 
 sample_varbinds = {
             os.getenv('OID_SETTLEMENT_TYPE'): 'settlement',
