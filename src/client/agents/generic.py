@@ -25,7 +25,7 @@ class SNMPNotification:
         varbinds (dict [str:str]): Key-value pairs where each OID (str) is
             associated with a value (str) to be sent in the notification
     """
-    def __init__(self, notification_type_OID: str, varbinds: dict = {}):
+    def __init__(self, notification_type_OID: str, varbinds: list = []):
         """
         Initializes a SNMPNotification instance with the provided notification
         type OID and a dictionary of varbinds.
@@ -79,8 +79,6 @@ class SNMPNotification:
         if (self.varbinds):
             # Add varbinds to the notification from the list of varbinds
             for varbind in self.varbinds:
-                print(f"OID: {varbind.OID}")
-                print(f"Value: {varbind.message}")
                 notification.add_varbinds(
                     ObjectType(
                         ObjectIdentity(varbind.OID),
