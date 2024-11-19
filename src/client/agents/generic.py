@@ -22,8 +22,9 @@ class SNMPNotification:
 
     Attributes:
         notification_type_OID (str): The OID for the notification type.
-        varbinds (dict [str:str]): Key-value pairs where each OID (str) is
-            associated with a value (str) to be sent in the notification
+        varbinds (list [Varbind(str:str)]): list of varbinds, where
+            each varbind contains a OID(str) and a message(str) to be sent
+            in the notification.
     """
     def __init__(self, notification_type_OID: str, varbinds: list = []):
         """
@@ -32,16 +33,16 @@ class SNMPNotification:
 
         Args:
             notification_type_OID (str): The object identifier for the type of
-            notification.
-            varbinds (dict): Key-value pairs where each key is an OID (str)
-                and each value is the data (str) to be sent in the
                 notification.
+            varbinds (list [Varbind(str:str)]): list of varbinds, where
+                each varbind contains a OID(str) and a message(str) to be sent
+                in the notification.
 
         Example:
-            varbinds = {
-                '1.3.6.1.4.1.9.9.599.1.3.1': 'status',
-                '1.3.6.1.4.1.9.9.599.1.3.2': 'success'
-            }
+            varbinds = [
+                Varbind('1.3.6.1.4.1.9.9.599.1.3.1', 'status'),
+                Varbind('1.3.6.1.4.1.9.9.599.1.3.2', 'success')
+            ]
             notification = SNMPNotification('1.3.6.1.4.1.9.9.599.1.1',
                                             varbinds)
 
@@ -54,7 +55,7 @@ class SNMPNotification:
         Creates an SNMP NotificationType object based on the provided OID and
         varbinds.
 
-        Iterates over the varbinds dictionary to add each OID-value pair to the
+        Iterates over the varbinds list to add each Varbind to the
         NotificationType object as a varbind.
 
         Returns:
@@ -66,8 +67,8 @@ class SNMPNotification:
             raise AttributeError('notification_type_OID is not specficied')
 
         if (not isinstance(self.varbinds, list)):
-            raise AttributeError(f'varbinds is not type list is \
-                                 {type(self.varbinds)}')
+            raise AttributeError(f'varbinds is {type(self.varbinds)} type,\
+                                 must be list of Varbinds')
 
         if (not isinstance(self.notification_type_OID, str)):
             raise AttributeError('notification_type_OID is not type str')
@@ -107,7 +108,8 @@ class SNMPAgent:
         target (dict): Target IP and port for the SNMP trap.
         notification_OID (str): The Object Identifier (OID) for the
         notification type.
-        varbinds (dict): Dictionary of OIDs and their associated values.
+        varbinds (list(Varbind)): Dictionary of OIDs and their associated
+            varbinds.
     """
     def __init__(self,
                  ipv4_host=os.getenv('IPv4_HOST_IP'),
@@ -123,8 +125,9 @@ class SNMPAgent:
             port (int): Port number of the SNMP target.
             notification_OID (str, optional): OID for the type of SNMP
                 notification.
-            varbinds (dict, optional): Dictionary of varbinds where each key
-                is an OID (str) and value is the data associated with it.
+            varbinds (list(Varbind), optional): Dictionary of varbinds where
+                each key is an OID (str) and value is the data associated with
+                it.
         """
 
         self.snmp_engine = SnmpEngine()

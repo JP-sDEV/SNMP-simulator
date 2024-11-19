@@ -24,15 +24,15 @@ class TransactionSNMPAgent(SNMPAgent):
             variables.
         notification_OID (str, optional): The OID for the SNMP notification
             type.
-        varbinds (dict, optional): Dictionary of varbinds with OIDs as keys
-            and values as data.
+        varbinds (list(Varbind), optional): List of varbinds with Varbind
+            containing OID(str) and message(str).
     """
 
     def __init__(self,
                  ipv4_host: str = os.getenv('IPv4_HOST_IP'),
                  port: str = os.getenv('PORT'),
                  notification_OID: str = None,
-                 varbinds: dict = None):
+                 varbinds: list = None):
         """
         Initializes the TransactionSNMPAgent with host details and optional
         varbinds.
