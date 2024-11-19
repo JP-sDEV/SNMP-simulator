@@ -1,6 +1,6 @@
 import os
 import random
-from agents.generic import SNMPAgent
+from src.client.agents.generic import SNMPAgent
 from dotenv import load_dotenv
 
 # Determine which .env file to load
