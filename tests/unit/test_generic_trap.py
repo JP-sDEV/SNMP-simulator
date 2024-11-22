@@ -1,7 +1,10 @@
 import os
 import pytest
-from src.client.agents.generic import SNMPAgent
-from src.client.components.varbinds import Varbind
+from client.agents.generic import SNMPAgent
+from client.components.varbinds import Varbind
+
+import sys
+print("\n".join(sys.path))
 
 
 sample_varbinds = [

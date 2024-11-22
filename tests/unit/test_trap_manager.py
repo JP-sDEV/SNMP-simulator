@@ -1,9 +1,9 @@
 import os
 import pytest
 import asyncio
-from src.commands.trap.manager import SNMPManager
-from src.client.agents.transaction import TransactionSNMPAgent
-from src.client.components.varbinds import Varbind
+from commands.trap.manager import SNMPManager
+from client.agents.transaction import TransactionSNMPAgent
+from client.components.varbinds import Varbind
 
 
 sample_varbinds = [

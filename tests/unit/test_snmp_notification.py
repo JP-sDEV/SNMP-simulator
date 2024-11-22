@@ -1,7 +1,7 @@
 import os
 import pytest
-from src.client.agents.generic import SNMPNotification
-from src.client.components.varbinds import Varbind
+from client.agents.generic import SNMPNotification
+from client.components.varbinds import Varbind
 from pysnmp.hlapi.asyncio import NotificationType
 
 sample_varbinds = [
