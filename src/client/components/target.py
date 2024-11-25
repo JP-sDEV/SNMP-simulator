@@ -43,10 +43,8 @@ class SNMPAgentTarget(QtWidgets.QWidget):
         port_text = port_edit.text().strip()
 
         if validate_port(port_text):
-            print("valid port")
             port_edit.setStyleSheet("")
             self.parent.update_port(port_text)
 
         else:
-            print("invalid port")
             port_edit.setStyleSheet("border: 1px solid red;")
