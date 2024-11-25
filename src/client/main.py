@@ -4,6 +4,7 @@ from agents.transaction import TransactionSNMPAgent
 from components.target import SNMPAgentTarget
 from components.varbinds import SNMPAgentVarbinds
 from components.notification import SNMPNotification
+from components.save_load import SaveLoadConfig
 from helpers.validation import validate_host_ip, validate_port, validate_OID
 
 
@@ -65,11 +66,15 @@ class SNMPAgentClient(QtWidgets.QWidget):
         layout.addWidget(self.send_btn)
 
         # Save/Load
-        self.save_btn = QtWidgets.QPushButton('Save')
-        layout.addWidget(self.save_btn)
-
-        self.load_btn = QtWidgets.QPushButton('Load')
-        layout.addWidget(self.load_btn)
+        self.save_load = SaveLoadConfig(
+            ipv4_host=self.ipv4_host,
+            port=self.port,
+            varbinds=self.varbinds,
+            varbinds_widget=self.agent_varbinds,
+            notification_OID=self.notification_OID,
+            parent=self
+        )
+        layout.addWidget(self.save_load)
 
         self.setLayout(layout)
 
@@ -84,14 +89,27 @@ class SNMPAgentClient(QtWidgets.QWidget):
     def update_ipv4_host(self, new_host: str):
         if validate_host_ip(new_host):
             self.ipv4_host.setText(new_host)
+            self.update_state('target_ip', True)
+        else:
+            self.update_state('target_ip', False)
 
     def update_port(self, new_port: str):
         if validate_port(new_port):
+            print("valid port: main")
             self.port.setText(new_port)
+            self.update_state('target_port', True)
+
+        else:
+            print("invalid port: main")
+            self.update_state('target_port', False)
 
     def update_notification(self, new_notification_OID: str):
         if validate_OID(new_notification_OID):
-            self.port.setText(new_notification_OID)
+            self.notification_OID.setText(new_notification_OID)
+            self.update_state('notification_OID', True)
+
+        else:
+            self.update_state('notification_OID', False)
 
     async def send(self):
         for child in self.findChildren(QtWidgets.QLineEdit):
@@ -102,9 +120,9 @@ class SNMPAgentClient(QtWidgets.QWidget):
                 return
 
         agent = TransactionSNMPAgent(
-                ipv4_host=(self.ipv4_host.text()),
-                port=(self.port.text()),
-                notification_OID=self.notification_OID.text(),
+                ipv4_host=(self.ipv4_host.text().strip()),
+                port=(self.port.text().strip()),
+                notification_OID=self.notification_OID.text().strip(),
                 varbinds=self.varbinds)
 
         await agent._send_trap_async()

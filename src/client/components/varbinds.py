@@ -91,3 +91,56 @@ class SNMPAgentVarbinds(QtWidgets.QWidget):
             oid_edit.setStyleSheet("border: 1px solid red;")
             if self.update_state_callback:
                 self.update_state_callback('varbinds', False)
+
+    def load_varbind(self, OID, message):
+        """
+        Load a varbind into the widget with the specified OID and message.
+
+        :param OID: The OID string to load.
+        :param message: The message string to load.
+        """
+        # Validate the OID before proceeding
+        if not validate_OID(OID):
+            QtWidgets.QMessageBox.warning(
+                self,
+                "Invalid OID",
+                f"The provided OID '{OID}' is invalid."
+            )
+            return
+
+        # Create a new Varbind instance and add it to the varbinds list
+        new_varbind = Varbind(OID=OID, message=message)
+        self.varbinds.append(new_varbind)
+
+        # Create a horizontal layout for the input fields and labels
+        field_layout = QtWidgets.QHBoxLayout()
+
+        # Label and QLineEdit for OID
+        oid_label = QtWidgets.QLabel("OID:")
+        oid_edit = QtWidgets.QLineEdit()
+        oid_edit.setText(OID)  # Set the provided OID
+        oid_edit.editingFinished.connect(lambda oid_edit=oid_edit,
+                                         varbind=new_varbind:
+                                         self.update_OID(oid_edit, varbind))
+        field_layout.addWidget(oid_label)
+        field_layout.addWidget(oid_edit)
+
+        # Label and QLineEdit for message
+        message_label = QtWidgets.QLabel("Message:")
+        message_edit = QtWidgets.QLineEdit()
+        message_edit.setText(message)  # Set the provided message
+        message_edit.textChanged.connect(lambda text, varbind=new_varbind:
+                                         setattr(varbind, "message", text))
+        field_layout.addWidget(message_label)
+        field_layout.addWidget(message_edit)
+
+        # Delete button for removing this set of fields
+        delete_button = QtWidgets.QPushButton("Delete")
+        delete_button.clicked.connect(lambda: self.delete_varbind(field_layout,
+                                                                  new_varbind))
+        field_layout.addWidget(delete_button)
+
+        # Add the field layout to the main layout
+        self.layout.addLayout(field_layout)
+
+        self.update_state_callback('varbinds', True)
