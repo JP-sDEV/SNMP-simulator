@@ -35,22 +35,18 @@ class SNMPAgentTarget(QtWidgets.QWidget):
         if validate_host_ip(ip_text):
             ip_edit.setStyleSheet("")
             self.parent.update_ipv4_host(ip_text)
-            self.update_state_callback('target_ip', True)
 
         else:
             ip_edit.setStyleSheet("border: 1px solid red;")
-            self.update_state_callback('target_ip', False)
 
     def update_port(self, port_edit):
         port_text = port_edit.text().strip()
 
         if validate_port(port_text):
+            print("valid port")
             port_edit.setStyleSheet("")
             self.parent.update_port(port_text)
-            self.update_state_callback('target_port', True)
-            print('good port')
 
         else:
+            print("invalid port")
             port_edit.setStyleSheet("border: 1px solid red;")
-            self.update_state_callback('target_port', False)
-            print('bad port')

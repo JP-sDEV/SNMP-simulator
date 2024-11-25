@@ -28,7 +28,7 @@ class SNMPNotification(QtWidgets.QWidget):
 
         if validate_OID(oid_text):
             oid_edit.setStyleSheet("")
-            self.parent.update_port(oid_text)
+            self.parent.update_notification(oid_text)
             self.update_state_callback('notification_OID', True)
 
         else:
