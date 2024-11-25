@@ -4,7 +4,8 @@ from agents.transaction import TransactionSNMPAgent
 from components.target import SNMPAgentTarget
 from components.varbinds import SNMPAgentVarbinds
 from components.notification import SNMPNotification
-from components.save_load import SaveLoadConfig
+from components.save_config import SaveConfig
+from components.load_config import LoadConfig
 from helpers.validation import validate_host_ip, validate_port, validate_OID
 
 
@@ -61,12 +62,11 @@ class SNMPAgentClient(QtWidgets.QWidget):
 
         # Send
         self.send_btn = QtWidgets.QPushButton('Send')
-        # self.send_btn.clicked.connect(self.send)
         self.send_btn.clicked.connect(self.handle_send)
         layout.addWidget(self.send_btn)
 
-        # Save/Load
-        self.save_load = SaveLoadConfig(
+        # Save Config
+        self.save = SaveConfig(
             ipv4_host=self.ipv4_host,
             port=self.port,
             varbinds=self.varbinds,
@@ -74,7 +74,17 @@ class SNMPAgentClient(QtWidgets.QWidget):
             notification_OID=self.notification_OID,
             parent=self
         )
-        layout.addWidget(self.save_load)
+        layout.addWidget(self.save)
+
+        self.load = LoadConfig(
+            ipv4_host=self.ipv4_host,
+            port=self.port,
+            varbinds=self.varbinds,
+            varbinds_widget=self.agent_varbinds,
+            notification_OID=self.notification_OID,
+            parent=self
+        )
+        layout.addWidget(self.load)
 
         self.setLayout(layout)
 
@@ -86,6 +96,9 @@ class SNMPAgentClient(QtWidgets.QWidget):
         if state in self.valid:
             self.valid[state] = new_state
 
+    def get_valid_state(self):
+        return all(self.valid.values())
+
     def update_ipv4_host(self, new_host: str):
         if validate_host_ip(new_host):
             self.ipv4_host.setText(new_host)
@@ -95,12 +108,10 @@ class SNMPAgentClient(QtWidgets.QWidget):
 
     def update_port(self, new_port: str):
         if validate_port(new_port):
-            print("valid port: main")
             self.port.setText(new_port)
             self.update_state('target_port', True)
 
         else:
-            print("invalid port: main")
             self.update_state('target_port', False)
 
     def update_notification(self, new_notification_OID: str):
@@ -112,10 +123,18 @@ class SNMPAgentClient(QtWidgets.QWidget):
             self.update_state('notification_OID', False)
 
     async def send(self):
+        if not self.get_valid_state():
+            invalid_msg = QtWidgets.QMessageBox()
+            invalid_msg.setIcon(QtWidgets.QMessageBox.Critical)
+            invalid_msg.setWindowTitle("Error")
+            invalid_msg.setText("Invalid Config")
+            invalid_msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+            invalid_msg.exec()
+            return
+
         for child in self.findChildren(QtWidgets.QLineEdit):
             child.clearFocus()
         for field, status in self.valid.items():
-            print(f"{field}: {status}")
             if status is False:
                 return
 
