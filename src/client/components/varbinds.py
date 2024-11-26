@@ -9,25 +9,39 @@ class Varbind:
 
 
 class SNMPAgentVarbinds(QtWidgets.QWidget):
-    def __init__(self, varbinds: dict,
+    def __init__(self, varbinds: list,
                  parent=None,
                  update_state_callback=None):
         super().__init__(parent)
 
-        # Dict to hold Varbind instances and their layouts
+        # List to hold Varbind instances
         self.varbinds = varbinds
         self.update_state_callback = update_state_callback
 
         # Set up the main layout
-        self.layout = QtWidgets.QVBoxLayout()
+        self.main_layout = QtWidgets.QVBoxLayout()
 
-        # Button to add new Varbinds
-        self.add_field_button = QtWidgets.QPushButton("Add New Field Set")
+        # Scroll area to contain the fields
+        self.scroll_area = QtWidgets.QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+
+        # Widget to hold the fields layout
+        self.scroll_content = QtWidgets.QWidget()
+        self.fields_layout = QtWidgets.QVBoxLayout(self.scroll_content)
+
+        # Add the scroll content to the scroll area
+        self.scroll_area.setWidget(self.scroll_content)
+        self.main_layout.addWidget(self.scroll_area)
+
+        # Button to add new Varbinds (stays at the bottom)
+        self.add_field_button = QtWidgets.QPushButton("Add New OID Message")
         self.add_field_button.clicked.connect(self.add_varbind)
-        self.layout.addWidget(self.add_field_button)
 
-        # Set layout to this widget
-        self.setLayout(self.layout)
+        # Add the button below the scroll area
+        self.main_layout.addWidget(self.add_field_button)
+
+        # Set the main layout to this widget
+        self.setLayout(self.main_layout)
 
     def add_varbind(self):
         # Create a new Varbind instance
@@ -60,8 +74,14 @@ class SNMPAgentVarbinds(QtWidgets.QWidget):
                                                                   new_varbind))
         field_layout.addWidget(delete_button)
 
-        # Add the field layout to the main layout
-        self.layout.addLayout(field_layout)
+        # Add the field layout at the top of the fields layout
+        self.fields_layout.insertLayout(0, field_layout)
+
+        # Update the scroll area's size
+        self.scroll_content.adjustSize()
+
+        # Scroll to the top of the scrollable area
+        self.scroll_area.verticalScrollBar().setValue(0)
 
     def delete_varbind(self, field_layout, varbind):
         # Remove the varbind from the list
@@ -73,8 +93,11 @@ class SNMPAgentVarbinds(QtWidgets.QWidget):
             if widget:
                 widget.deleteLater()
 
-        # Remove the layout from the main layout
-        self.layout.removeItem(field_layout)
+        # Remove the layout from the fields layout
+        self.fields_layout.removeItem(field_layout)
+
+        # Update the scroll area's size
+        self.scroll_content.adjustSize()
 
     def update_OID(self, oid_edit, varbind):
         """Validates the OID when editing is finished."""
@@ -87,7 +110,6 @@ class SNMPAgentVarbinds(QtWidgets.QWidget):
                 self.update_state_callback('varbinds', True)
         else:
             # OID is invalid, display an error
-            # Highlight the field
             oid_edit.setStyleSheet("border: 1px solid red;")
             if self.update_state_callback:
                 self.update_state_callback('varbinds', False)
@@ -140,7 +162,15 @@ class SNMPAgentVarbinds(QtWidgets.QWidget):
                                                                   new_varbind))
         field_layout.addWidget(delete_button)
 
-        # Add the field layout to the main layout
-        self.layout.addLayout(field_layout)
+        # Add the field layout at the top of the fields layout
+        self.fields_layout.insertLayout(0, field_layout)
 
-        self.update_state_callback('varbinds', True)
+        # Update the scroll area's size
+        self.scroll_content.adjustSize()
+
+        # Scroll to the top of the scrollable area
+        self.scroll_area.verticalScrollBar().setValue(0)
+
+        # Notify state update
+        if self.update_state_callback:
+            self.update_state_callback('varbinds', True)

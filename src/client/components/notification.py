@@ -13,15 +13,16 @@ class SNMPNotification(QtWidgets.QWidget):
         self.notification_OID = notification_OID
         self.update_state_callback = update_state_callback
 
-        layout = QtWidgets.QVBoxLayout()
+        self.layout = QtWidgets.QHBoxLayout()
 
         self.notification_OID.editingFinished.connect(
            lambda: self.update_notification_OID(self.notification_OID)
         )
 
-        layout.addWidget(self.notification_OID)
+        self.layout.addWidget(QtWidgets.QLabel("Notification OID:"))
+        self.layout.addWidget(self.notification_OID)
 
-        self.setLayout(layout)
+        self.setLayout(self.layout)
 
     def update_notification_OID(self, oid_edit):
         oid_text = oid_edit.text().strip()

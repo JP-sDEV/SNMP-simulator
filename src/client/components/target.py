@@ -15,7 +15,7 @@ class SNMPAgentTarget(QtWidgets.QWidget):
         self.port = port
         self.update_state_callback = update_state_callback
 
-        layout = QtWidgets.QVBoxLayout()
+        layout = QtWidgets.QHBoxLayout()
 
         self.ipv4_host.editingFinished.connect(
            lambda: self.update_ip(self.ipv4_host)
@@ -24,7 +24,9 @@ class SNMPAgentTarget(QtWidgets.QWidget):
             lambda: self.update_port(self.port)
         )
 
+        layout.addWidget(QtWidgets.QLabel("IPv4 Host:"))
         layout.addWidget(self.ipv4_host)
+        layout.addWidget(QtWidgets.QLabel("Port:"))
         layout.addWidget(self.port)
 
         self.setLayout(layout)

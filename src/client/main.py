@@ -1,5 +1,7 @@
 import sys
 from PySide6 import QtWidgets
+from PySide6.QtGui import QFont
+from PySide6.QtCore import Qt
 from agents.transaction import TransactionSNMPAgent
 from components.target import SNMPAgentTarget
 from components.varbinds import SNMPAgentVarbinds
@@ -28,8 +30,21 @@ class SNMPAgentClient(QtWidgets.QWidget):
         # Varbinds
         self.varbinds = []
 
+        # Window Labels
+        window_title = QtWidgets.QLabel("SNMPv2c Agent Simulator")
+        font = QFont()
+        font.setPointSize(24)
+        font.setBold(True)
+        window_title.setFont(font)
+        window_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setWindowTitle("SNMP Agent Simulator")
+
         # Layout
-        layout = QtWidgets.QVBoxLayout()
+        main_layout = QtWidgets.QVBoxLayout()
+        btn_layout = QtWidgets.QHBoxLayout()
+        send_layout = QtWidgets.QVBoxLayout()
+
+        main_layout.addWidget(window_title)
 
         # Agent
         self.target = SNMPAgentTarget(parent=self,
@@ -47,25 +62,16 @@ class SNMPAgentClient(QtWidgets.QWidget):
             parent=self,
             update_state_callback=self.update_state)
 
-        layout.addWidget(QtWidgets.QLabel("IPv4 Host:"))
-        layout.addWidget(self.ipv4_host)
-
-        layout.addWidget(QtWidgets.QLabel("Port:"))
-        layout.addWidget(self.port)
-
-        layout.addWidget(QtWidgets.QLabel("Varbinds:"))
-        layout.addWidget(self.agent_varbinds)
-        layout.addWidget(self.target)
-
-        layout.addWidget(QtWidgets.QLabel("Notification OID:"))
-        layout.addWidget(self.notification)
+        main_layout.addWidget(self.target)
+        main_layout.addWidget(self.notification)
+        main_layout.addWidget(self.agent_varbinds)
 
         # Send
         self.send_btn = QtWidgets.QPushButton('Send')
         self.send_btn.clicked.connect(self.handle_send)
-        layout.addWidget(self.send_btn)
+        send_layout.addWidget(self.send_btn)
 
-        # Save Config
+        # Save/Load Config
         self.save = SaveConfig(
             ipv4_host=self.ipv4_host,
             port=self.port,
@@ -74,7 +80,7 @@ class SNMPAgentClient(QtWidgets.QWidget):
             notification_OID=self.notification_OID,
             parent=self
         )
-        layout.addWidget(self.save)
+        btn_layout.addWidget(self.save)
 
         self.load = LoadConfig(
             ipv4_host=self.ipv4_host,
@@ -84,9 +90,17 @@ class SNMPAgentClient(QtWidgets.QWidget):
             notification_OID=self.notification_OID,
             parent=self
         )
-        layout.addWidget(self.load)
+        btn_layout.addWidget(self.load)
 
-        self.setLayout(layout)
+        btn_group = QtWidgets.QWidget()
+        btn_group.setLayout(btn_layout)
+        send_btn = QtWidgets.QWidget()
+        send_btn.setLayout(send_layout)
+
+        main_layout.addWidget(send_btn)
+        main_layout.addWidget(btn_group)
+
+        self.setLayout(main_layout)
 
     def handle_send(self):
         import asyncio
