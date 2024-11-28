@@ -3,6 +3,16 @@ from helpers.validation import validate_OID
 
 
 class SNMPNotification(QtWidgets.QWidget):
+    """
+    Represents a SNMP Notification OID. Attached to the SNMP trap message.
+
+    Attributes:
+        parent: parent Widget
+        notification_OID (QtWidgets.QLineEdit): QLineEdit widget for
+            notification OID.
+        update_state_callback (function): method to update state from parent
+            widget.
+    """
     def __init__(self,
                  parent,
                  notification_OID: QtWidgets.QLineEdit,
@@ -25,6 +35,13 @@ class SNMPNotification(QtWidgets.QWidget):
         self.setLayout(self.layout)
 
     def update_notification_OID(self, oid_edit):
+        """
+        Wrapper function to validate the notification OID field and update
+        validation state in parent.
+
+        Args:
+            oid_edit (QtWidgets.QLineEdit): New value in the OID field.
+        """
         oid_text = oid_edit.text().strip()
 
         if validate_OID(oid_text):

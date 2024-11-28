@@ -12,6 +12,10 @@ from helpers.validation import validate_host_ip, validate_port, validate_OID
 
 
 class SNMPAgentClient(QtWidgets.QWidget):
+    """
+    A client to set the IP, port, OID, and varbinds in the SNMPAgent class.
+    """
+
     def __init__(self):
         super().__init__()
 
@@ -22,6 +26,7 @@ class SNMPAgentClient(QtWidgets.QWidget):
             "notification_OID": False,
             "varbinds": False
         }
+
         # Target
         self.ipv4_host = QtWidgets.QLineEdit(self)
         self.port = QtWidgets.QLineEdit(self)
@@ -39,12 +44,10 @@ class SNMPAgentClient(QtWidgets.QWidget):
         window_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setWindowTitle("SNMP Agent Simulator")
 
-        # Layout
+        # Layouts
         main_layout = QtWidgets.QVBoxLayout()
-        btn_layout = QtWidgets.QHBoxLayout()
+        btn_layout = QtWidgets.QHBoxLayout()  # Save/Load buttons
         send_layout = QtWidgets.QVBoxLayout()
-
-        main_layout.addWidget(window_title)
 
         # Agent
         self.target = SNMPAgentTarget(parent=self,
@@ -62,14 +65,9 @@ class SNMPAgentClient(QtWidgets.QWidget):
             parent=self,
             update_state_callback=self.update_state)
 
-        main_layout.addWidget(self.target)
-        main_layout.addWidget(self.notification)
-        main_layout.addWidget(self.agent_varbinds)
-
         # Send
         self.send_btn = QtWidgets.QPushButton('Send')
         self.send_btn.clicked.connect(self.handle_send)
-        send_layout.addWidget(self.send_btn)
 
         # Save/Load Config
         self.save = SaveConfig(
@@ -80,7 +78,6 @@ class SNMPAgentClient(QtWidgets.QWidget):
             notification_OID=self.notification_OID,
             parent=self
         )
-        btn_layout.addWidget(self.save)
 
         self.load = LoadConfig(
             ipv4_host=self.ipv4_host,
@@ -90,30 +87,56 @@ class SNMPAgentClient(QtWidgets.QWidget):
             notification_OID=self.notification_OID,
             parent=self
         )
-        btn_layout.addWidget(self.load)
 
         btn_group = QtWidgets.QWidget()
         btn_group.setLayout(btn_layout)
         send_btn = QtWidgets.QWidget()
         send_btn.setLayout(send_layout)
 
+        # Adding Widgets to window
+        main_layout.addWidget(window_title)
+        main_layout.addWidget(self.target)
+        main_layout.addWidget(self.notification)
+        main_layout.addWidget(self.agent_varbinds)
+        send_layout.addWidget(self.send_btn)
+        btn_layout.addWidget(self.save)
+        btn_layout.addWidget(self.load)
         main_layout.addWidget(send_btn)
         main_layout.addWidget(btn_group)
 
         self.setLayout(main_layout)
 
     def handle_send(self):
+        """
+        Send SNMP Trap message to configured SNMP Manager, async process.
+        """
         import asyncio
         asyncio.run(self.send())
 
-    def update_state(self, state, new_state):
+    def update_state(self, state: str, new_state):
+        """
+        Update application state by field
+
+        Args:
+            state (str): name of state to update
+            new_state (any): value to update state
+        """
         if state in self.valid:
             self.valid[state] = new_state
 
     def get_valid_state(self):
+        """
+        Return True if all fields are True (i.e. valid)
+        """
         return all(self.valid.values())
 
     def update_ipv4_host(self, new_host: str):
+        """
+        Update and validate the user inputted IPv4 host field and state.
+
+        Args:
+            new_host (str): The user input for target IPv4.
+        """
         if validate_host_ip(new_host):
             self.ipv4_host.setText(new_host)
             self.update_state('target_ip', True)
@@ -121,6 +144,12 @@ class SNMPAgentClient(QtWidgets.QWidget):
             self.update_state('target_ip', False)
 
     def update_port(self, new_port: str):
+        """
+        Update and validate the user inputted port field and state.
+
+        Args:
+            new_port (str): The user input for target port.
+        """
         if validate_port(new_port):
             self.port.setText(new_port)
             self.update_state('target_port', True)
@@ -129,6 +158,12 @@ class SNMPAgentClient(QtWidgets.QWidget):
             self.update_state('target_port', False)
 
     def update_notification(self, new_notification_OID: str):
+        """
+        Update and validate the user inputted notification OID field and state.
+
+        Args:
+            new_notification_OID (str): The user input for notification OID.
+        """
         if validate_OID(new_notification_OID):
             self.notification_OID.setText(new_notification_OID)
             self.update_state('notification_OID', True)
@@ -137,6 +172,9 @@ class SNMPAgentClient(QtWidgets.QWidget):
             self.update_state('notification_OID', False)
 
     async def send(self):
+        """
+        Send the SNMP Trap message to the user configured target.
+        """
         if not self.get_valid_state():
             invalid_msg = QtWidgets.QMessageBox()
             invalid_msg.setIcon(QtWidgets.QMessageBox.Critical)

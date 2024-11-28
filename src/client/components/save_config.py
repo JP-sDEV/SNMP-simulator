@@ -4,6 +4,21 @@ import json
 
 
 class SaveConfig(QtWidgets.QWidget):
+    """
+    Custom QtPy widget to validate before saving the current SNMP trap
+    configuration as a .json
+    file.
+
+    Attributes:
+        ipv4_host (QtWidgets.QLineEdit): QLineEdit widget for IPv4 host.
+        port (QtWidgets.QLineEdit): QLineEdit widget for port.
+        varbinds_widget (SNMPAgentVarbinds): SNMPAgentVarbinds widget from
+            parent widget.
+        notification_OID (QtWidgets.QLineEdit):  QLineEdit widget for
+            notification OID.
+        varbinds (list(Varbinds)): List of varbinds.
+        parent (QtWidget): Parent widget.
+    """
     def __init__(self,
                  ipv4_host: QtWidgets.QLineEdit,
                  port: QtWidgets.QLineEdit,
@@ -34,6 +49,10 @@ class SaveConfig(QtWidgets.QWidget):
         self.setLayout(self.layout)
 
     def save_config(self):
+        """
+        Check if current config is valid before prompting user to save current
+        config as a .json file.
+        """
         state = {
             "ipv4_host": self.ipv4_host.text(),
             "port": self.port.text(),

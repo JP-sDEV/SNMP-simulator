@@ -4,6 +4,20 @@ import json
 
 
 class LoadConfig(QtWidgets.QWidget):
+    """
+    Custom QtPy widget to prompt user to load a SNMP target config .json file.
+    Sets the config in the client in their respective fields.
+
+    Attributes:
+        ipv4_host (QtWidgets.QLineEdit): QLineEdit widget for IPv4 host.
+        port (QtWidgets.QLineEdit): QLineEdit widget for port.
+        varbinds_widget (SNMPAgentVarbinds): SNMPAgentVarbinds widget from
+            parent widget.
+        notification_OID (QtWidgets.QLineEdit):  QLineEdit widget for
+            notification OID.
+        varbinds (list(Varbinds)): List of varbinds.
+        parent (QtWidget): Parent widget.
+    """
     def __init__(self,
                  ipv4_host: QtWidgets.QLineEdit,
                  port: QtWidgets.QLineEdit,
@@ -33,6 +47,9 @@ class LoadConfig(QtWidgets.QWidget):
         self.setLayout(self.layout)
 
     def load_config(self):
+        """
+        Load config from .json file. Sets the config into respective fields.
+        """
         # Prompt user to select a file to load
         options = QtWidgets.QFileDialog.Options()
         file_path, _ = QtWidgets.QFileDialog.getOpenFileName(
