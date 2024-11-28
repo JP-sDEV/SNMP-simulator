@@ -16,7 +16,7 @@ class SaveConfig(QtWidgets.QWidget):
             parent widget.
         notification_OID (QtWidgets.QLineEdit):  QLineEdit widget for
             notification OID.
-        varbinds (list(Varbinds)): List of varbinds.
+        varbinds (list(Varbind)): List of varbinds.
         parent (QtWidget): Parent widget.
     """
     def __init__(self,

@@ -9,7 +9,19 @@ class Varbind:
 
 
 class SNMPAgentVarbinds(QtWidgets.QWidget):
-    def __init__(self, varbinds: list,
+    """
+    Varbinds to be associated with SNMP trap message. Configure and manages a
+    list of Varbind instances.
+
+    Attributes:
+        varbinds (list(Varbind)): list of varbinds, where
+                 each varbind contains a OID(str) and a message(str) to be sent
+                 in the notification.
+        parent (QtWidget): Parent widget.
+        update_state_callback (function): callback to update parent state.
+    """
+    def __init__(self,
+                 varbinds: list,
                  parent=None,
                  update_state_callback=None):
         super().__init__(parent)
@@ -44,6 +56,9 @@ class SNMPAgentVarbinds(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
 
     def add_varbind(self):
+        """
+        Add varbind to from client form.
+        """
         # Create a new Varbind instance
         new_varbind = Varbind()
         self.varbinds.append(new_varbind)
@@ -84,6 +99,13 @@ class SNMPAgentVarbinds(QtWidgets.QWidget):
         self.scroll_area.verticalScrollBar().setValue(0)
 
     def delete_varbind(self, field_layout, varbind):
+        """
+        Delete varbind from list of varbinds.
+
+        Arg(s):
+            field_layout (QtWidgets.QVBoxLayout): Qtpy layout to update.
+            varbind (Varbind): varbind to remove from list.
+        """
         # Remove the varbind from the list
         self.varbinds.remove(varbind)
 
@@ -100,7 +122,13 @@ class SNMPAgentVarbinds(QtWidgets.QWidget):
         self.scroll_content.adjustSize()
 
     def update_OID(self, oid_edit, varbind):
-        """Validates the OID when editing is finished."""
+        """
+        Validates the OID when editing is finished.
+
+        Arg(s):
+            oid_edit (QtWidgets.QLineEdit): new changes in OID field.
+            varbind (Varbind): changed Varbind instance.
+        """
         oid_text = oid_edit.text().strip()
         if validate_OID(oid_text):
             # OID is valid, update the Varbind
@@ -118,8 +146,9 @@ class SNMPAgentVarbinds(QtWidgets.QWidget):
         """
         Load a varbind into the widget with the specified OID and message.
 
-        :param OID: The OID string to load.
-        :param message: The message string to load.
+        Arg(s):
+            OID (str): The OID string to load.
+            message (str): The message string to load.
         """
         # Validate the OID before proceeding
         if not validate_OID(OID):
