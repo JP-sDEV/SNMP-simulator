@@ -1,0 +1,45 @@
+name: flake8-lint
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: flake8
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.13"
+          cache: "pip"
+
+      - name: Update pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install flake8
+        run: pip install flake8
+
+      - name: Get changed Python files
+        id: changed-files
+        uses: tj-actions/changed-files@v41.0.0
+        with:
+          files: "**/*.py"
+
+      - name: Lint modified files with flake8
+        run: |
+          if [ -n "${{ steps.changed-files.outputs.all_changed_files }}" ]; then
+            echo "Linting the following files:"
+            echo "${{ steps.changed-files.outputs.all_changed_files }}"
+            flake8 ${{ steps.changed-files.outputs.all_changed_files }}
+          else
+            echo "No Python files changed."
+          fi
