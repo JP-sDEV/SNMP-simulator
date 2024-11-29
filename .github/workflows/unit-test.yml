@@ -31,10 +31,10 @@ name: Unit Tests
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
+      - master
   workflow_run:
     workflows: ["flake8-lint"]
     types:
