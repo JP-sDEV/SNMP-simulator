@@ -27,15 +27,13 @@ jobs:
           pip install -r requirements.txt
 
   run-unit-tests:
+    name: Run Unit Tests
     runs-on: ubuntu-latest
     needs: install-dependencies
     steps:
       - name: Check Out Repository
         uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.13"
+
       - name: Run Tests
         run: |
           pytest
