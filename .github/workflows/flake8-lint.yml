@@ -40,6 +40,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: install-dependencies
     steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
       - name: Get changed Python files
         id: changed-files
         uses: tj-actions/changed-files@v41.0.0
