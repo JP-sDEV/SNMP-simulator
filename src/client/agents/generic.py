@@ -4,11 +4,6 @@ from pysnmp.hlapi.asyncio import SnmpEngine, CommunityData, \
     ObjectType, ObjectIdentity
 from pysnmp.proto import rfc1902 as univ
 import asyncio
-from dotenv import load_dotenv
-
-# Determine which .env file to load
-env_file = '.env.test' if os.getenv('PYTEST_CURRENT_TEST') else '.env'
-load_dotenv(env_file)  # Load the appropriate environment file
 
 
 class SNMPNotification:

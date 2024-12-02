@@ -2,14 +2,9 @@ from pysnmp.carrier.asyncio.dispatch import AsyncioDispatcher
 from pysnmp.carrier.asyncio.dgram import udp, udp6
 from pyasn1.codec.ber import decoder
 from pysnmp.proto import api
-from dotenv import load_dotenv
 import asyncio
 import os
 import signal
-
-# Determine which .env file to load
-env_file = '.env.test' if os.getenv('PYTEST_CURRENT_TEST') else '.env'
-load_dotenv(env_file)  # Load the appropriate environment file
 
 
 class SNMPManager:

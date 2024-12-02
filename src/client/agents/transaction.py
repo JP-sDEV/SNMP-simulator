@@ -1,11 +1,6 @@
 import os
 import random
 from agents.generic import SNMPAgent
-from dotenv import load_dotenv
-
-# Determine which .env file to load
-env_file = '.env.test' if os.getenv('PYTEST_CURRENT_TEST') else '.env'
-load_dotenv(env_file)  # Load the appropriate environment file
 
 
 class TransactionSNMPAgent(SNMPAgent):
