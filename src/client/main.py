@@ -197,6 +197,12 @@ class SNMPAgentClient(QtWidgets.QWidget):
                 varbinds=self.varbinds)
 
         await agent._send_trap_async()
+        sent_msg = QtWidgets.QMessageBox()
+        sent_msg.setIcon(QtWidgets.QMessageBox.Information)
+        sent_msg.setWindowTitle("Success")
+        sent_msg.setText("Sent SNMP Message")
+        sent_msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+        sent_msg.exec()
         print("sent trap")
 
 
