@@ -10,3 +10,4 @@ __pycache__/
 testing.json
 build
 dist
+.DS_Store
