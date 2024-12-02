@@ -8,3 +8,5 @@ __pycache__/
 .python-version
 *logs
 testing.json
+build
+dist
